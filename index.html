@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#07111c" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%2373f4e3' d='M3 15h18L16 8l2-2 12 10-12 10-2-2 5-7H3z'/%3E%3C/svg%3E" />
+  <title>OK / Uçuş Hattı</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+    :root{color-scheme:dark;--cyan:#73f4e3;--gold:#ffcf74;--muted:#a3b2c2;--panel:rgba(8,19,30,.76)}
+    *{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111c;color:#f5f8fa;font-family:Manrope,system-ui,sans-serif;touch-action:none}
+    #game{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
+    .vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,transparent 34%,rgba(3,8,14,.18) 76%,rgba(3,8,14,.65) 130%);z-index:1}
+    .hud{position:fixed;inset:0;z-index:2;pointer-events:none;padding:clamp(16px,3vw,34px);display:flex;flex-direction:column;justify-content:space-between}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px}.brand-mark{width:38px;height:38px;border:1px solid rgba(115,244,227,.48);border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-size:21px;background:rgba(9,27,39,.63);box-shadow:0 0 25px rgba(60,225,214,.12)}
+    .brand-name{font-weight:800;letter-spacing:.18em;font-size:12px}.brand-sub{font:10px 'DM Mono',monospace;letter-spacing:.16em;color:#93a6b8;margin-top:3px}
+    .stats{display:flex;gap:9px}.stat{min-width:88px;padding:10px 14px;border:1px solid rgba(185,221,233,.13);background:var(--panel);backdrop-filter:blur(14px);border-radius:12px;text-align:right}.stat-label{font:9px 'DM Mono',monospace;letter-spacing:.16em;color:#9badbc}.stat-value{font-size:20px;font-weight:800;line-height:1.15;margin-top:3px}.stat-value.cyan{color:var(--cyan)}
+    .bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}.hint{font:10px 'DM Mono',monospace;letter-spacing:.08em;color:#b8c5ce;padding:11px 14px;border:1px solid rgba(185,221,233,.12);background:rgba(6,16,25,.58);border-radius:10px}.hint b{color:var(--cyan);font-weight:500}.progress-wrap{width:min(230px,30vw);text-align:right}.progress-label{display:flex;justify-content:space-between;font:9px 'DM Mono',monospace;letter-spacing:.14em;color:#a8b8c6;margin-bottom:8px}.progress-track{height:3px;background:rgba(255,255,255,.15);border-radius:9px;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#61d9d3,#ffe19a);box-shadow:0 0 14px #70f4e2;transition:width .25s}
+    .toast{position:absolute;left:50%;top:23%;transform:translate(-50%,-10px);font-size:clamp(16px,2.4vw,25px);font-weight:800;letter-spacing:.08em;color:var(--gold);text-shadow:0 0 24px rgba(255,201,97,.7);opacity:0;transition:.24s;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .overlay{position:fixed;inset:0;z-index:3;display:grid;place-items:center;padding:20px;background:rgba(3,9,15,.34);backdrop-filter:blur(3px);transition:opacity .35s,visibility .35s}.overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.card{width:min(500px,100%);padding:clamp(26px,5vw,46px);border:1px solid rgba(160,225,232,.23);border-radius:22px;background:linear-gradient(145deg,rgba(13,31,43,.94),rgba(7,17,28,.92));box-shadow:0 28px 100px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.06);text-align:center}.eyebrow{font:10px 'DM Mono',monospace;letter-spacing:.25em;color:var(--cyan);margin-bottom:18px}.title{font-size:clamp(36px,8vw,60px);line-height:.98;font-weight:800;letter-spacing:-.07em;margin:0}.title span{color:var(--cyan)}.description{max-width:350px;margin:17px auto 25px;color:#b4c2cd;font-size:14px;line-height:1.7}.instructions{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;margin:0 auto 25px;max-width:365px}.instruction{padding:10px 12px;border:1px solid rgba(185,221,233,.1);border-radius:10px;background:rgba(255,255,255,.025);font-size:11px;color:#c5d0d8;line-height:1.5}.instruction strong{display:block;color:var(--cyan);font:10px 'DM Mono',monospace;letter-spacing:.1em;margin-bottom:3px}.play{border:0;border-radius:12px;padding:15px 26px;background:var(--cyan);color:#07161b;font:800 12px Manrope,sans-serif;letter-spacing:.13em;cursor:pointer;min-width:190px;box-shadow:0 8px 30px rgba(77,237,221,.22);transition:transform .18s,filter .18s}.play:hover{transform:translateY(-2px);filter:brightness(1.08)}.play:active{transform:translateY(0)}.small-note{font:9px 'DM Mono',monospace;color:#718697;letter-spacing:.1em;margin-top:17px}
+    @media(max-width:600px){.hud{padding:16px}.brand-mark{width:34px;height:34px}.brand-name{font-size:10px}.brand-sub{font-size:8px}.stats{gap:6px}.stat{min-width:68px;padding:8px 9px}.stat-label{font-size:8px}.stat-value{font-size:17px}.bottom{align-items:flex-end}.hint{font-size:8px;padding:9px 10px;max-width:55%}.progress-wrap{width:36vw}.instructions{gap:6px}.instruction{font-size:10px;padding:8px}}
+  </style>
+</head>
+<body>
+  <div id="game"></div><div class="vignette"></div>
+  <div class="hud">
+    <div class="topbar">
+      <div class="brand"><div class="brand-mark">➤</div><div><div class="brand-name">OK / UÇUŞ HATTI</div><div class="brand-sub">ARCADE FLIGHT · 01</div></div></div>
+      <div class="stats"><div class="stat"><div class="stat-label">SKOR</div><div class="stat-value cyan" id="score">0000</div></div><div class="stat"><div class="stat-label">SERİ</div><div class="stat-value" id="combo">×0</div></div><div class="stat"><div class="stat-label">KALAN</div><div class="stat-value" id="lives">◆ ◆ ◆</div></div></div>
+    </div>
+    <div class="toast" id="toast">İSABET! +100</div>
+    <div class="bottom"><div class="hint"><b>WASD / OK TUŞLARI</b> · veya dokunup sürükle<br>Hedefin merkezinden geç!</div><div class="progress-wrap"><div class="progress-label"><span>UÇUŞ</span><span id="progressText">0 / 12</span></div><div class="progress-track"><div class="progress-fill" id="progress"></div></div></div></div>
+  </div>
+  <div class="overlay" id="overlay"><div class="card"><div class="eyebrow">BİR OK · BİR UÇUŞ</div><h1 class="title" id="title">Hedefe<br><span>uç.</span></h1><p class="description" id="description">Sen oku yönlendir. Renkli hedeflerin tam merkezinden geç, serini büyüt ve uçuş hattını tamamla.</p><div class="instructions"><div class="instruction"><strong>YÖNLENDİR</strong>WASD / ok tuşları<br>veya ekranda sürükle</div><div class="instruction"><strong>HEDEF</strong>Altın merkeze hizalan<br>ve isabet al</div></div><button class="play" id="play">UÇUŞA BAŞLA</button><div class="small-note">12 HEDEF · 3 ŞANS · MERKEZİ TUT</div></div></div>
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+    const host=document.querySelector('#game');
+    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;host.appendChild(renderer.domElement);
+    const scene=new THREE.Scene();scene.background=new THREE.Color(0x07121d);scene.fog=new THREE.FogExp2(0x07121d,.012);
+    const camera=new THREE.PerspectiveCamera(67,innerWidth/innerHeight,.1,260);
+    scene.add(new THREE.HemisphereLight(0x95d8ef,0x101725,2.0));
+    const keyLight=new THREE.DirectionalLight(0xe4f7ff,3.2);keyLight.position.set(-5,8,-2);scene.add(keyLight);
+    const cyanLight=new THREE.PointLight(0x40f0df,24,36);scene.add(cyanLight);
+    const goldLight=new THREE.PointLight(0xffbb58,34,25);scene.add(goldLight);
+    const mat=(color,metalness=0,roughness=.45,emissive=0,ei=0)=>new THREE.MeshStandardMaterial({color,metalness,roughness,emissive,emissiveIntensity:ei});
+    const floorMat=mat(0x0a1c29,.38,.7);
+    const floor=new THREE.Mesh(new THREE.PlaneGeometry(240,260),floorMat);floor.rotation.x=-Math.PI/2;floor.position.set(0,-8,95);scene.add(floor);
+    const grid=new THREE.GridHelper(240,60,0x1f5964,0x16313f);grid.position.set(0,-7.95,95);grid.scale.z=1.1;scene.add(grid);
+    // Long luminous corridor rails establish depth and keep the arrow's path readable.
+    for(const x of [-10.5,10.5]){const rail=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,250,8),new THREE.MeshBasicMaterial({color:0x1b8c91}));rail.rotation.x=Math.PI/2;rail.position.set(x,0,100);scene.add(rail)}
+    const starGeo=new THREE.BufferGeometry(),starCount=560,starPos=new Float32Array(starCount*3);for(let i=0;i<starCount;i++){starPos[i*3]=(Math.random()-.5)*100;starPos[i*3+1]=(Math.random()-.5)*64;starPos[i*3+2]=Math.random()*240-35}starGeo.setAttribute('position',new THREE.BufferAttribute(starPos,3));scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0x93d9e8,size:.105,transparent:true,opacity:.65,sizeAttenuation:true})));
+    // The player is an actual 3D arrow: faceted steel shaft, arrowhead and stabilizing fletching.
+    const player=new THREE.Group();player.scale.setScalar(1.38);scene.add(player);
+    const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.075,.105,1.62,10),mat(0xbde9e9,.76,.22,0x286a72,.2));shaft.rotation.x=Math.PI/2;shaft.position.z=-.18;player.add(shaft);
+    const shaftBand=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,.14,10),mat(0xffcc75,.72,.24,0xffa51e,.35));shaftBand.rotation.x=Math.PI/2;shaftBand.position.z=-.48;player.add(shaftBand);
+    const head=new THREE.Mesh(new THREE.ConeGeometry(.25,.62,6),mat(0xf4fbf7,.82,.16,0x63e8dc,.32));head.rotation.x=Math.PI/2;head.position.z=.94;player.add(head);
+    const headCore=new THREE.Mesh(new THREE.ConeGeometry(.12,.25,6),mat(0x78fff0,.55,.18,0x38ffed,1.6));headCore.rotation.x=Math.PI/2;headCore.position.z=1.22;player.add(headCore);
+    const finMat=mat(0x67dcd5,.48,.3,0x1aa89f,.45);
+    for(let i=0;i<3;i++){const fin=new THREE.Mesh(new THREE.BoxGeometry(.52,.035,.43),finMat);fin.position.set(0,0,-.9);fin.rotation.z=i*Math.PI/3;player.add(fin)}
+    const aura=new THREE.PointLight(0x55ffe9,4,9);aura.position.z=-.2;player.add(aura);
+    const targets=[];const targetTotal=12;let spawned=0,passed=0,score=0,combo=0,lives=3,running=false,finished=false,elapsed=0,speed=17.5,desiredX=0,desiredY=0,toastTimer=0;
+    const scoreEl=document.querySelector('#score'),comboEl=document.querySelector('#combo'),livesEl=document.querySelector('#lives'),progressEl=document.querySelector('#progress'),progressText=document.querySelector('#progressText'),toastEl=document.querySelector('#toast'),overlay=document.querySelector('#overlay'),playBtn=document.querySelector('#play');
+    const targetMaterial=(color,emissive,intensity)=>new THREE.MeshStandardMaterial({color,metalness:.22,roughness:.32,emissive,emissiveIntensity:intensity,side:THREE.DoubleSide});
+    function makeTarget(z){
+      const g=new THREE.Group(),radius=1.62;
+      const outer=new THREE.Mesh(new THREE.TorusGeometry(radius,.075,10,64),targetMaterial(0x73f4e3,0x23cfc1,1.8));g.add(outer);
+      const back=new THREE.Mesh(new THREE.CircleGeometry(radius-.09,64),new THREE.MeshBasicMaterial({color:0x0b2530,transparent:true,opacity:.82,side:THREE.DoubleSide}));back.position.z=-.045;g.add(back);
+      for(const [r,c,e] of [[1.22,0x75d7d4,0x1b827f],[.82,0xd4e7d9,0x71948e],[.43,0xffcf74,0xff9f28]]){const ring=new THREE.Mesh(new THREE.TorusGeometry(r,.055,9,48),targetMaterial(c,e,.85));ring.position.z=.025;g.add(ring)}
+      const bull=new THREE.Mesh(new THREE.CircleGeometry(.27,40),new THREE.MeshBasicMaterial({color:0xffcf74,side:THREE.DoubleSide}));bull.position.z=.03;g.add(bull);
+      const hub=new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),new THREE.MeshBasicMaterial({color:0xffffff}));hub.position.z=.055;g.add(hub);
+      // Small support struts give the target a dimensional, floating-ring silhouette.
+      const supportMat=mat(0x306b75,.58,.34,0x123b45,.3);for(const y of [-1,1]){const stem=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.5,6),supportMat);stem.position.set(0,y*1.95,-.22);g.add(stem)}
+      g.position.set((Math.random()-.5)*7.5,(Math.random()-.5)*4.6,z);scene.add(g);targets.push({group:g,x:g.position.x,y:g.position.y,z,done:false});
+    }
+    function reset(){
+      targets.forEach(t=>scene.remove(t.group));targets.length=0;spawned=0;passed=0;score=0;combo=0;lives=3;elapsed=0;speed=17.5;desiredX=0;desiredY=0;player.position.set(0,0,0);player.rotation.set(0,0,0);finished=false;running=true;
+      for(let i=0;i<6;i++){makeTarget(24+i*20);spawned++}updateHUD();overlay.classList.add('hidden');
+    }
+    function updateHUD(){scoreEl.textContent=String(score).padStart(4,'0');comboEl.textContent='×'+combo;livesEl.textContent='◆ '.repeat(lives).trim()||'—';progressEl.style.width=(Math.min(100,passed/targetTotal*100))+'%';progressText.textContent=`${Math.min(passed,targetTotal)} / ${targetTotal}`}
+    function toast(text){toastEl.textContent=text;toastEl.classList.add('show');toastTimer=1.05}
+    function endGame(won){if(finished)return;running=false;finished=true;document.querySelector('#title').innerHTML=won?'Uçuş<br><span>tamam.</span>':'Yeniden<br><span>dene.</span>';document.querySelector('#description').textContent=won?`Harika uçuş! ${score} puan ve ${combo} hedeflik son seri.`:`${score} puan topladın. Merkeze daha yakın hizalanıp uçuşu tamamlayabilirsin.`;playBtn.textContent='TEKRAR UÇ';document.querySelector('.small-note').textContent=won?'YENİ BİR UÇUŞA HAZIR MISIN?':'BU KEZ TAM İSABET';overlay.classList.remove('hidden')}
+    function steer(dt){const smooth=1-Math.exp(-dt*5.2);player.position.x+=(desiredX-player.position.x)*smooth;player.position.y+=(desiredY-player.position.y)*smooth;player.position.x=THREE.MathUtils.clamp(player.position.x,-5.4,5.4);player.position.y=THREE.MathUtils.clamp(player.position.y,-3.3,3.3);player.rotation.z=THREE.MathUtils.clamp((player.position.x-desiredX)*-.085,-.18,.18);player.rotation.x=THREE.MathUtils.clamp((player.position.y-desiredY)*.08,-.14,.14)}
+    const keys=new Set();window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if((e.key==='Enter'||e.key===' ')&&!running)playBtn.click()});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+    let pointerActive=false;function pointerMove(e){if(!running)return;const rect=renderer.domElement.getBoundingClientRect();const nx=(e.clientX-rect.left)/rect.width*2-1,ny=(e.clientY-rect.top)/rect.height*2-1;desiredX=nx*5;desiredY=-ny*3.1;pointerActive=true}
+    renderer.domElement.addEventListener('pointerdown',e=>{pointerActive=true;renderer.domElement.setPointerCapture?.(e.pointerId);pointerMove(e)});renderer.domElement.addEventListener('pointermove',pointerMove);renderer.domElement.addEventListener('pointerup',()=>{});
+    playBtn.addEventListener('click',reset);
+    function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.8))}window.addEventListener('resize',resize);
+    let last=performance.now();
+    function animate(now){requestAnimationFrame(animate);const dt=Math.min(.04,(now-last)/1000);last=now;
+      if(running){elapsed+=dt;const keyX=(keys.has('a')||keys.has('arrowleft')?-1:0)+(keys.has('d')||keys.has('arrowright')?1:0),keyY=(keys.has('w')||keys.has('arrowup')?1:0)+(keys.has('s')||keys.has('arrowdown')?-1:0);if(keyX||keyY){desiredX=THREE.MathUtils.clamp(desiredX+keyX*dt*6,-5.4,5.4);desiredY=THREE.MathUtils.clamp(desiredY+keyY*dt*5,-3.3,3.3)}
+        steer(dt);player.position.z+=speed*dt;speed=Math.min(22,speed+dt*.08);camera.position.lerp(new THREE.Vector3(player.position.x+3.15,player.position.y+2.15,player.position.z-7.8),1-Math.exp(-dt*2.8));camera.lookAt(player.position.x+.15,player.position.y*.55+.2,player.position.z+13);cyanLight.position.set(player.position.x,player.position.y,player.position.z+2.5);
+        while(spawned<targetTotal&&targets.length<7){makeTarget(player.position.z+118);spawned++}
+        for(const t of targets){if(t.done)continue;const d=t.z-player.position.z;if(d<1.25){t.done=true;passed++;const dx=player.position.x-t.x,dy=player.position.y-t.y,dist=Math.hypot(dx,dy);if(dist<.54){combo++;score+=100+Math.min(combo-1,9)*25;toast(combo>1?`İSABET! +${100+Math.min(combo-1,9)*25} · SERİ ×${combo}`:'İSABET! +100');goldLight.position.set(t.x,t.y,t.z);goldLight.intensity=55}else{combo=0;lives--;toast(dist<1.25?'YAKINDI · MERKEZİ TUT':'ISKA · HİZANI DÜZELT');if(lives<=0){updateHUD();endGame(false)}}updateHUD();scene.remove(t.group)} }
+        for(let i=targets.length-1;i>=0;i--)if(targets[i].done)targets.splice(i,1);
+        if(passed>=targetTotal)endGame(true);
+      } else {camera.position.lerp(new THREE.Vector3(0,2.8,-8.8),.025);camera.lookAt(0,0,12);player.position.z+=dt*2.1}
+      if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)toastEl.classList.remove('show')}
+      // Subtle animation in the fletching and target glows.
+      player.children[3].rotation.z+=dt*.32;
+      renderer.render(scene,camera)
+    }requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

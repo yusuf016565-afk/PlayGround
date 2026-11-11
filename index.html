@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101326">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='12' height='12' rx='3' fill='%23c8f36a'/%3E%3Crect x='17' y='3' width='12' height='12' rx='3' fill='%239ede75'/%3E%3Crect x='3' y='17' width='12' height='12' rx='3' fill='%2380d887'/%3E%3Crect x='17' y='17' width='12' height='12' rx='3' fill='%23c8f36a'/%3E%3C/svg%3E">
+  <title>Çiftle — Blok Bulmacası</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <main class="game-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Çiftle ana sayfa">
+        <span class="brand-mark"><i></i><i></i><i></i><i></i></span>
+        <span>çiftle<span class="brand-period">.</span></span>
+      </a>
+      <button class="icon-button" id="sound-toggle" type="button" aria-label="Ses efektleri kapalı" title="Ses efektleri">
+        <svg class="sound-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5ZM16 9l5 6m0-6-5 6"/></svg>
+        <svg class="sound-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5ZM15.5 8.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13"/></svg>
+      </button>
+    </header>
+
+    <section class="intro">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> ZİHİN EGZERSİZİ · 01</div>
+      <h1>Birleştir.<br><span>İkiye katla.</span></h1>
+      <p class="subtitle">Aynı blokları üst üste sürükle, değerlerini ikiye katla ve rekorunu kır.</p>
+    </section>
+
+    <section class="score-row" aria-label="Skor tablosu">
+      <div class="score-card score-main"><span class="score-label">SKOR</span><strong id="score">0</strong><span class="score-flare">✦</span></div>
+      <div class="score-card"><span class="score-label">EN İYİ</span><strong id="best">0</strong><span class="best-icon">♛</span></div>
+      <div class="goal-card"><div class="goal-top"><span>HEDEF</span><strong id="goal-value">2048</strong></div><div class="goal-track"><span id="goal-progress"></span></div></div>
+    </section>
+
+    <section class="board-card" aria-label="Blok oyun alanı">
+      <div class="board-topline"><div><span class="live-dot"></span><span id="status-text">HAMLE BEKLİYOR</span></div><span class="block-count" id="block-count">0 BLOK</span><span class="board-size">5 × 5</span></div>
+      <div class="board" id="board" role="grid" aria-label="5'e 5 blok bulmacası"></div>
+      <div class="board-caption"><span class="caption-star">✦</span><span id="message">Aynı sayıdaki iki bloğu eşleştir.</span></div>
+      <div class="overlay" id="overlay" hidden>
+        <div class="overlay-card"><span class="overlay-icon" id="overlay-icon">✦</span><h2 id="overlay-title">Harika!</h2><p id="overlay-copy">Hedefe ulaştın.</p><button class="primary-button" id="continue-button" type="button">DEVAM ET <span>→</span></button></div>
+      </div>
+    </section>
+
+    <div class="action-row">
+      <button class="secondary-button" id="shuffle-button" type="button"><span class="button-icon">⤨</span> Karıştır <span class="shuffle-count" id="shuffle-count">1</span></button>
+      <button class="reset-button" id="reset-button" type="button"><span>↻</span> Yeni oyun</button>
+    </div>
+    <section class="how-to"><div class="how-icon">↗</div><div><strong>Nasıl oynanır?</strong><p>Bir bloğu eşit sayıdaki bloğun üzerine bırak. Değerleri birleşir, blok ikiye katlanır ve skor kazanırsın. Boş yerlere sürükleyerek tahtada konum değiştirebilirsin.</p></div></section>
+    <footer><span>SAKİN KAL. EŞLEŞTİR. KATLA.</span><span>✦</span></footer>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
